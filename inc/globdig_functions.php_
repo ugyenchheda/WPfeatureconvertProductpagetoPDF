@@ -1,0 +1,179 @@
+<?php
+
+/**
+ * ------------------------------------------------------------------------------------------------
+ * Functions for wishlist
+ * ------------------------------------------------------------------------------------------------
+ */
+
+
+ add_action( 'wp_enqueue_scripts', 'globdig_scripts', 9999 );
+
+ function globdig_scripts() {
+wp_enqueue_script( 'globdig_js', get_stylesheet_directory_uri() . '/js/globdig.js', array(), '3.7.3' );
+ }
+
+ add_action("wp_ajax_productfav", "productfav");
+ add_action("wp_ajax_nopriv_productfav", "productfav");
+
+ function productfav() {
+   $cook_user = return_user();
+
+	 $responce = [];
+	 if($_POST['add_rem'] == 'add'){
+	 		$post_id=$_POST['post_id'];
+	 		$do = 'remove';
+	 		 $responce['status'] = 'error';
+	 		 $insert_w = insert_wishlist($cook_user,$post_id);
+	 		 if ( $insert_w > 0 ){
+	 			 $responce['status'] = 'success';
+	 		 }
+	 		$responce['message'] = 'Product added on Favourite';
+	 		$j_action = "product_favorite('".$post_id."','".$do."')";
+			$responce['count_wishlist'] = count_wishlist($cook_user);
+
+			if($_POST['modal'] == 'modal'){
+	 			$j_action = "product_favorite('".$post_id."','".$do."','modal')";
+		 		$responce['fragment'] =  '<a class="myFabbtn"  onclick="'.$j_action.'" title="Remove from favourite list."><i class="fa fa-heart  removeWine"></i></a>';		
+
+			 }
+			 
+			 else{
+			 $responce['fragment'] =  '<a class="myFabbtn" onclick="'.$j_action.'" title="Remove from favourite list."><i class="fa fa-heart added"></a>';
+			 }
+	 	}elseif($_POST['add_rem'] == 'remove'){
+	 		$post_id=$_POST['post_id'];
+	 		$do = 'add';
+	 		$responce['status'] = 'error';
+	 		$remove_w = remove_wishlist($cook_user,$post_id);
+	 		if ( $remove_w ){
+	 			$responce['status'] = 'success';
+			}
+	 		$responce['message'] = 'Product removed on Favourite';
+	 		$j_action = "product_favorite('".$post_id."','".$do."')";
+			 $responce['count_wishlist'] = count_wishlist($cook_user);
+			 
+			 if($_POST['modal'] == 'modal'){
+				$j_action = "product_favorite('".$post_id."','".$do."','modal')";
+				$responce['fragment'] =  '<a class="myFabbtn" onclick="'.$j_action.'" title="Add to favourite list."><i class="fa fa-heart  addWine"></a></a>';		
+
+			} else {
+				$responce['fragment'] =  '<a class="myFabbtn" onclick="'.$j_action.'" title="Add to favourite list."><i class="fa fa-heart removed"></a></a>';
+			}
+	 		
+	 	}
+	 	echo json_encode( $responce );
+	 	die();
+
+ }
+
+
+ add_action("wp_ajax_productfav_order", "productfav_order");
+ add_action("wp_ajax_productfav_order", "productfav_order");
+
+ function productfav_order() {
+	global $wpdb;
+	$responce = [];
+	$i=5;
+	$post_datas = $_POST['prod_id'];
+	$packages_images = "wp_globdig_wishlist";
+	foreach ($post_datas as $key => $value) {
+		$wpdb->update(
+		$packages_images,
+				array(
+				'glob_order' => $i	// integer (number)
+				),
+				array( 'id' => $value ),
+				array('%s'	),
+				array( '%d' )
+		);
+	 $i++;
+	}
+
+	$responce['message'] = 'Order Save Successfully';
+	$responce['status'] = true;
+	echo json_encode( $responce );
+
+	die();
+}
+
+add_action("wp_ajax_favoriteremove", "fav_remove");
+add_action("wp_ajax_nopriv_favoriteremove", "fav_remove");
+
+function fav_remove() {
+$responce = [];
+
+   $post_id=$_POST['post_id'];
+   $remove_w = remove_wishlist($_COOKIE['gd_favuser'],$post_id);
+   if ( $remove_w ){
+     $responce['status'] = 'success';
+      $responce['rid'] = $post_id;
+   }
+   $responce['count_wishlist'] = count_wishlist($_COOKIE['gd_favuser']);
+   $responce['message'] = 'Product Remove Favourite';
+
+
+ echo json_encode( $responce );
+ die();
+
+}
+
+ function insert_wishlist($user,$post_id){
+	 global $wpdb;
+ 	$wpdb->insert(
+ 			'wp_globdig_wishlist',
+ 			array(
+ 				'user_id' =>  $user,
+ 				'product_id' => $post_id,
+ 				'glob_order' => '1',
+ 			),
+ 			array(
+ 				'%s',
+ 				'%s',
+ 				'%s',
+
+ 			)
+ 		);
+ 		return $wpdb->insert_id;
+ }
+
+ function remove_wishlist($user,$post_id){
+	 global $wpdb;
+ 	$result = $wpdb->delete(
+ 		'wp_globdig_wishlist',
+ 			array( 'user_id' => $user,
+ 		 					'product_id' => $post_id ),
+ 							array(
+ 								'%s',
+ 								'%s'
+ 							)
+ 					);
+ 		return $result;
+  }
+
+ function check_wishlist($user,$post_id){
+	 	global $wpdb;
+		 $results = $wpdb->get_results(
+			  "SELECT * FROM `wp_globdig_wishlist` WHERE `user_id` = '".$user."' AND `product_id` = $post_id", OBJECT );
+			 if($results){
+				 $return = 'added';
+			 }else{
+				 $return = 'notadded';
+			 }
+		 return $return;
+	 }
+
+ function count_wishlist( $user ){
+	 	global $wpdb;
+		 $results = $wpdb->get_results( "SELECT * FROM `wp_globdig_wishlist` WHERE `user_id` = '".$user."' ORDER BY `glob_order` ASC", OBJECT );
+
+		 return count($results);
+	 }
+
+function return_user(){
+  if(!isset($_COOKIE['gd_favuser'])) {
+     $cookie_value = uniqid('gd_');
+     setcookie('gd_favuser', $cookie_value, time() + (86400), "/");
+   }
+   return $_COOKIE['gd_favuser'];
+}

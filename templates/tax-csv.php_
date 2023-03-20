@@ -1,0 +1,80 @@
+<?php /* Template Name: ProductTax import csv */ ?>
+
+<?php get_header();
+?>
+
+<div class="wrap">
+	<div id="primary" class="content-area" style="
+    padding: 257px;
+">
+		<main id="main" class="site-main" role="main">
+			<h1>Import members From Here</h1>
+<?php
+	ini_set('memory_limit', -1);
+	ini_set('max_execution_time',-1);
+	global $wpdb;
+	if(isset($_POST['submitMember']))
+	{
+		if(isset($_FILES['csvfile']))
+		{
+			$query = "CREATE TABLE IF NOT EXISTS producer (TermID int, TermName text, TermSlug text, ParentID int, Termdescrip text, Imagelogo text)";
+
+			$wpdb->query($query);
+			$file = fopen($_FILES['csvfile']['tmp_name'],"r");
+			$keys = fgetcsv($file,0,",","\"");
+			// echo "<pre>";		
+			// 	print_r($keys);
+			// echo "</pre>";		
+
+			// 	exit;
+			$duplicate = 0;
+			$rows= 0;
+			$errors = 0;
+			while(! feof($file))
+			{
+			
+
+				$row = fgetcsv($file,0,",","\"");
+				if($row)
+				{
+					//$wpdb->show_errors();
+					$data =		$wpdb->insert("producer",array(
+															'TermID'=>mb_convert_encoding(isset($row[0])?$row[0]:'',"HTML-ENTITIES","UTF-8"),
+															'TermName'=>mb_convert_encoding(isset($row[1])?$row[1]:'',"HTML-ENTITIES","UTF-8"),
+															'TermSlug'=>mb_convert_encoding(isset($row[2])?$row[2]:'',"HTML-ENTITIES","UTF-8"),
+															'ParentID'=>mb_convert_encoding(isset($row[4])?$row[4]:'',"HTML-ENTITIES","UTF-8"),
+															'Termdescrip'=>mb_convert_encoding(isset($row[5])?$row[5]:'',"HTML-ENTITIES","UTF-8"),
+															'Imagelogo'=>mb_convert_encoding(isset($row[7])?$row[7]:'',"HTML-ENTITIES","UTF-8"),							
+															// 'Bransjeid'=>iconv( "Windows-1252", "UTF-8", isset($row[1])?$row[1]:''),															
+															// 'Bransjetekst'=>iconv( "Windows-1252", "UTF-8", isset($row[5])?$row[5]:''),															
+															// 'Mor'=>iconv( "Windows-1252", "UTF-8", isset($row[12])?$row[12]:''),
+													));
+					if(!$data)
+					{
+						$errors++;
+						echo '<pre>';
+						echo $row[0];
+							//echo implode("','", $row);
+						echo "</pre>";
+					}
+				}
+
+				echo $errors;
+			}
+
+		}
+	}
+
+?>
+
+			<form action="" method="POST" enctype="multipart/form-data">
+				<input type="file" name="csvfile" accept=".csv">
+				<button type="submit" name="submitMember">Import members</button>
+
+			</form>
+
+		</main><!-- #main -->
+	</div><!-- #primary -->
+</div><!-- .wrap -->
+
+<?php get_footer();

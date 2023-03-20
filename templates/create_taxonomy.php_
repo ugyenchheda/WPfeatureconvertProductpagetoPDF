@@ -1,0 +1,102 @@
+<?php /* Template Name: Create Product Taxonomy */ ?>
+
+<?php get_header();
+
+ini_set('memory_limit', -1);
+ini_set('max_execution_time',-1);
+global $wpdb;
+
+if (isset($_GET['pageno'])) {
+	$pageno = $_GET['pageno'];
+} else {
+	$pageno = 1;
+}
+
+$total_rows_cnt = $wpdb->get_var("SELECT count(*) FROM producer");
+
+$no_of_records_per_page = 50;
+$total_pages = ceil($total_rows_cnt / $no_of_records_per_page);
+$offset = ($pageno-1) * $no_of_records_per_page;
+
+global $wpdb;
+global $offset;
+global $no_of_records_per_page;
+
+
+
+?>
+
+<div class="wrap">
+	<div id="primary" class="content-area" style="
+    padding: 257px;
+">
+		<main id="main" class="site-main" role="main">
+			<h1>Create Taxonomy</h1>
+
+
+<?php 
+
+$sql = "SELECT *  FROM producer WHERE 1 = 1 order by TermID asc LIMIT $offset, $no_of_records_per_page";
+$results = $wpdb->get_results($sql);
+if( $results ) {
+  foreach( $results as $entry ) {
+	 
+	if($entry->ParentID == 0){
+		$parent_term_id = 0;
+	} else{
+		$result_meta = $wpdb->get_row('select * from '.$wpdb->prefix.'termmeta where meta_key = "producer_id" and  meta_value = "'. $entry->ParentID.'"');
+		if($result_meta){
+			$parent_term_id = $result_meta->term_id;
+		}
+	}
+
+
+	$insert_data = wp_insert_term(
+						$entry->TermName,   // the term 
+						'producer', // the taxonomy
+						array(
+							 'description' => $entry->Termdescrip,
+							'parent'      => $parent_term_id,
+						)
+					);
+	
+	if ( ! empty( $insert_data ) && ! is_wp_error( $insert_data ) ) {
+		//echo '---------'.$insert_data['term_id'];
+		if($insert_data){
+			update_term_meta($insert_data['term_id'], 'producer_id', $entry->TermID);
+			if(!empty($entry->Imagelogo)) {
+				// update_term_meta($insert_data['term_id'], 'palmer_producer_logo', $entry->Imagelogo);			
+				taxImageManage($entry->Imagelogo, $insert_data['term_id']);
+			}
+			
+			
+		}	
+	}			
+
+  }
+}
+?>
+
+
+    
+<h2> Total Pages : <?php echo $total_pages; ?></h2>
+
+<ul class="pagination">
+
+        <li class="<?php if($pageno <= 1){ echo 'disabled'; } ?>">
+            <a href="<?php if($pageno <= 1){ echo '#'; } else { echo "?pageno=".($pageno - 1); } ?>">Prev</a>
+        </li>
+        <li class="<?php if($pageno >= $total_pages){ echo 'disabled'; } ?>">
+            <a href="<?php if($pageno >= $total_pages){ echo '#'; } else { echo "?pageno=".($pageno + 1); } ?>">Next</a>
+        </li>
+
+    </ul>
+
+
+		</main><!-- #main -->
+	</div><!-- #primary -->
+</div><!-- .wrap -->
+
+
+
+<?php get_footer();
