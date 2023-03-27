@@ -94,8 +94,7 @@ require 'inc/wishlist_functions.php';
 include 'vendor/autoload.php';
 include 'library/config_manager.php';
 
-/* Filter Products
------------------------------------------------  */
+/* filter for product wines */
 if (!function_exists('palmer_filter_product')) {
 	function palmer_filter_product()
 	{
