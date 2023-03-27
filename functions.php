@@ -337,8 +337,6 @@ if (!function_exists('palmer_filter_product')) {
 			});
 
 		});</script>';
-
-
 		$record_message = sprintf(esc_html(_n('%d PRODUCT MATCHES YOUR SEARCH CRITERIA', '%d PRODUCTS MATCH YOUR SEARCH CRITERIA', $record_count, 'hytteguiden')), $record_count);
 		$response_arr['content'] = $content;
 		$response_arr['record_count'] = $record_message;
@@ -366,7 +364,6 @@ function theme_slug_widgets_init()
 		'after_title'   => '</h2>',
 	));
 }
-
 
 if( ! function_exists( 'basel_compare_btn' ) ) {
 	function basel_compare_btn() {
@@ -418,7 +415,6 @@ function product_data_pdf($product)
 		$passertil_data[$p]['image'] = return_image_passertil01($value);
 		$p++;
 	}
-
 
 	if ($product->get_attribute('pa_fylde')) {
 		$attributes_images['pa_fylde_image'] = get_stylesheet_directory_uri() . "/images/progress/percent (" . $product->get_attribute('pa_fylde') . ").png";
