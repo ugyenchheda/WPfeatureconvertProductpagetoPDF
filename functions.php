@@ -376,8 +376,7 @@ if( ! function_exists( 'basel_compare_btn' ) ) {
 
 	}
 }
-
-
+//registering the product attribute
 function product_data_pdf($product)
 {
 	$data = [];
