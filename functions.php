@@ -625,10 +625,7 @@ function palmer_event_calendar_button(){
         die( 'No script kiddies please!' );
     }	
 }
-
-/**
- * Exclude products from a particular category on the shop page
- */
+/* horea option for the products*/
 function custom_pre_get_posts_query( $q ) {
 
     $tax_query = (array) $q->get( 'tax_query' );
