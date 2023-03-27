@@ -22,7 +22,6 @@ function basel_child_enqueue_styles() {
 	wp_enqueue_style( 'font-style', 'https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css');
 	wp_enqueue_style( 'simple-line-style', 'https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.4.1/css/simple-line-icons.min.css');
 	
-	
 	wp_enqueue_style( 'child-style', get_stylesheet_directory_uri() . '/style.css?v=544' );
 	wp_enqueue_style( 'child-style1', get_stylesheet_directory_uri() . '/style1.css?v=544' );
     wp_enqueue_style('select2.min', get_stylesheet_directory_uri() . '/css/chosen.css');
@@ -54,8 +53,7 @@ function child_theme_slug_setup() {
 }
 add_action( 'after_setup_theme', 'child_theme_slug_setup' );
 
-
-/* Delete record from table */
+/* meta value for price */
 function palmer_postmeta_mm_value($meta_key, $option = 'min')
 {
 	global $wpdb;
