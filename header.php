@@ -1,8 +1,4 @@
-<?php
-/**
- * The Header template for our theme
- */
-?><!DOCTYPE html>
+<!DOCTYPE html>
 <html class="ie ie8" <?php language_attributes(); ?>>
 <html <?php language_attributes(); ?>>
 <head>
