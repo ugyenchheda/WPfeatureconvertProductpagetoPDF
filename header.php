@@ -8,7 +8,7 @@
 	<link rel="pingback" href="<?php bloginfo( 'pingback_url' ); ?>">
 
 	<?php wp_head(); ?>
-	<!-- Global site tag (gtag.js) - Google Analytics -->
+	
 	<script async src="https://www.googletagmanager.com/gtag/js?id=UA-151993202-1"></script>
 
 	<script>
@@ -29,9 +29,6 @@
 </head>
 
 <body <?php body_class(); ?>>
-<!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TQB73VK" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
 <?php if ( basel_needs_header() ): ?>
 	<?php do_action( 'basel_after_body_open' ); ?>
 	<?php 
